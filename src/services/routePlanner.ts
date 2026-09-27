@@ -1,3 +1,4 @@
+import { mapWithConcurrency } from '../lib/concurrency';
 import { estimateLeg } from '../lib/estimate';
 import { buildNodes, makeLeg, optimizeRoute, pickBestMode, replaceLegs, WALK_MAX_KM, type TripSetup } from '../lib/optimizer';
 import type { Criterion, Passengers, Place, RouteLeg, RouteResult, TransportMode } from '../types';
@@ -7,6 +8,9 @@ export interface PlanOutput {
   nodes: Place[];
   result: RouteResult;
 }
+
+/** 구간 확정 시 동시에 조회할 최대 구간 수 (TMAP 등 무료 등급의 초당 호출 제한 대비) */
+const LEG_CONCURRENCY = 2;
 
 /**
  * 1) 노드 행렬 수집 (전략에 따라 추정 또는 API)
@@ -24,10 +28,8 @@ export async function planRoute(
   let result = optimizeRoute({ ...setup, nodes, matrices });
 
   if (strategy === 'estimate') {
-    const legs = await Promise.all(
-      result.legs.map((leg) =>
-        resolveLeg(provider, nodes, leg.fromIndex, leg.toIndex, setup.preferredModes, setup.criterion, setup.passengers, query),
-      ),
+    const legs = await mapWithConcurrency(result.legs, LEG_CONCURRENCY, (leg) =>
+      resolveLeg(provider, nodes, leg.fromIndex, leg.toIndex, setup.preferredModes, setup.criterion, setup.passengers, query),
     );
     result = replaceLegs(result, new Map(legs.map((leg, i) => [i, leg])));
   }
@@ -74,10 +76,8 @@ export async function researchSection(
   query?: LegQuery,
 ): Promise<RouteResult> {
   const indexes = result.legs.map((_, k) => k).filter((k) => k >= fromStop && k < toStop);
-  const legs = await Promise.all(
-    indexes.map((k) =>
-      resolveLeg(provider, nodes, result.legs[k].fromIndex, result.legs[k].toIndex, modes, criterion, passengers, query, true),
-    ),
+  const legs = await mapWithConcurrency(indexes, LEG_CONCURRENCY, (k) =>
+    resolveLeg(provider, nodes, result.legs[k].fromIndex, result.legs[k].toIndex, modes, criterion, passengers, query, true),
   );
   return replaceLegs(result, new Map(indexes.map((k, n) => [k, legs[n]])));
 }
