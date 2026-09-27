@@ -36,6 +36,11 @@
 | 자동차 | `POST https://apis.openapi.sk.com/tmap/routes?version=1` → `totalDistance`, `totalTime`, `taxiFare` |
 | 도보 | `POST https://apis.openapi.sk.com/tmap/routes/pedestrian?version=1` |
 | 대중교통 | `POST https://apis.openapi.sk.com/transit/routes` → `itineraries[].fare.regular.totalFare`, `legs[].mode` |
+| 역지오코딩 | `GET https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=…&lon=…` → `addressInfo.fullAddress` |
+| 지도 표시 | Web SDK `https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=…` (`Tmapv2.Map / Polyline / Marker`) |
+
+지도는 네이티브 SDK 대신 **Web SDK를 WebView(웹에서는 iframe)에 띄우는 방식**을 썼다 (`lib/tmapHtml.ts`, `components/TmapFrame*.tsx`).
+Expo Go에 포함된 `react-native-webview`만 쓰므로 개발 빌드 없이 실행할 수 있다. SDK를 10초 안에 불러오지 못하면 좌표 기반 미리보기로 대체한다.
 
 인증은 모든 요청에 `appKey` 헤더. 좌표계는 WGS84.
 

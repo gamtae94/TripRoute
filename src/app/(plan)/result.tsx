@@ -2,7 +2,8 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { RouteMap, type MapMarker } from '@/components/RouteMap';
+import type { MapMarker } from '@/components/RouteMap';
+import { RouteMapView } from '@/components/RouteMapView';
 import { Button, Chip, Screen, SectionTitle, StepHeader, styles } from '@/components/ui';
 import { getRoutingProvider } from '@/services/routing';
 import { useTripStore } from '@/store/tripStore';
@@ -56,6 +57,17 @@ export default function ResultScreen() {
     });
   }, [result, labels]);
 
+  // 지도 HTML이 매 렌더마다 다시 만들어지지 않도록 선택이 바뀔 때만 새로 만든다
+  const highlighted = useMemo(
+    () =>
+      new Set(
+        result && selStart !== null && selEnd !== null
+          ? result.legs.map((_, k) => k).filter((k) => k >= selStart && k < selEnd)
+          : [],
+      ),
+    [result, selStart, selEnd],
+  );
+
   if (!origin || !result) {
     return (
       <Screen>
@@ -66,7 +78,6 @@ export default function ResultScreen() {
   }
 
   const hasSection = selStart !== null && selEnd !== null;
-  const highlighted = new Set(hasSection ? result.legs.map((_, k) => k).filter((k) => k >= selStart && k < selEnd) : []);
 
   const onStopPress = (k: number) => {
     if (selStart === null || selEnd !== null) {
@@ -116,12 +127,7 @@ export default function ResultScreen() {
     <Screen footer={footer}>
       <StepHeader step={4} title="최적 방문 순서" description={ALGORITHM_LABEL[result.algorithm]} />
 
-      <RouteMap
-        markers={markers}
-        legs={result.legs}
-        highlighted={highlighted}
-        badge={getRoutingProvider().id === 'dummy' ? '미리보기 (더미 데이터)' : '경로 미리보기'}
-      />
+      <RouteMapView markers={markers} legs={result.legs} highlighted={highlighted} />
       <View style={[styles.chipRow, { justifyContent: 'center' }]}>
         {ALL_MODES.map((m) => (
           <Text key={m} style={{ color: MODE_COLOR[m], fontWeight: '700', fontSize: 12 }}>

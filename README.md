@@ -10,24 +10,36 @@
 
 - **출발·복귀 설정** — 출발지로 복귀(기본값)하거나 마지막 장소에서 끝내기. 다른 도시로 가는 여행이면 **경유 거점**(기차역·터미널)을 후보로 넣어, 가는 길과 돌아오는 길에 서로 다른 거점을 자동으로 고르게 할 수 있습니다.
   예) 대전 집 → 대전역 → **서울역** → 서울 여행 → **영등포역** → 서대전역 → 집
-- **장소 검색** — 키워드 자동완성으로 방문할 장소를 추가하고 순서를 직접 조정
+- **현재 위치** — GPS로 현재 위치를 출발지로 사용 (주소는 TMAP 역지오코딩)
+- **장소 검색** — 키워드 자동완성으로 방문할 장소를 추가하고, 손잡이(≡)를 끌어 순서를 직접 조정
 - **선호 이동 수단 (1~3개)** — 도보 / 대중교통 / 택시·자동차 중 원하는 것만 골라, 구간마다 그 안에서 가장 유리한 수단을 사용
 - **인원·분류별 요금** — 성인·청소년·어린이·영유아·경로·장애인 인원을 넣으면 API 요금에 할인 규칙을 적용해 일행 전체 비용을 계산
-- **결과 화면** — 방문 순서, 경로 미리보기, 총 시간·거리·비용, 구간별 안내
+- **결과 화면** — TMAP 지도 위 경로선·순서 마커, 총 시간·거리·비용, 구간별 안내
+  (TMAP 키가 없거나 지도를 불러오지 못하면 좌표 기반 미리보기로 대체)
 - **구간 재검색** — 결과에서 특정 지점부터 특정 지점까지 골라, 그 구간만 다른 수단으로 다시 검색
 - **설정 탭** — 경로 데이터(더미/TMAP) 선택, TMAP 키 입력(기기 보안 저장소에 저장), API 호출 방식 선택
 
 ## 실행
 
+준비물: Node.js 20 이상, 스마트폰에 **Expo Go** 앱 (App Store / Play 스토어)
+
 ```bash
+git clone https://github.com/gamtae94/TripRoute.git
+cd TripRoute
 npm install
-npx expo start        # Expo Go 앱으로 QR 스캔, 또는 w 키로 웹 실행
-npm run lint          # 린트
-npm run typecheck     # 타입 검사
-npm test              # 최적화·요금·TMAP 응답 파싱 테스트
+npx expo start        # 터미널에 QR 코드가 뜹니다
 ```
 
+- **스마트폰**: 같은 Wi-Fi에서 QR 코드를 스캔합니다 (iPhone은 카메라 앱, Android는 Expo Go 앱). 같은 네트워크가 아니면 `npx expo start --tunnel`.
+- **웹 브라우저**: 터미널에서 `w` 키 (또는 `npx expo start --web`). 웹에서는 API 키가 암호화되지 않은 localStorage에 저장되므로 확인용으로만 쓰세요.
+
 API 키 없이도 **더미 데이터**(서울 명소, 서울·대전 주요 역)로 전체 흐름을 확인할 수 있습니다.
+
+```bash
+npm run lint          # 린트
+npm run typecheck     # 타입 검사
+npm test              # 단위 테스트 (최적화·요금·TMAP 응답 파싱·위치·지도)
+```
 
 ## API 키 설정
 
@@ -46,15 +58,17 @@ src/
     _layout.tsx             # 하단 탭: 경로 만들기 / 설정
     (plan)/                 # 출발·복귀 → 장소 추가 → 수단·인원 → 결과
     settings.tsx
-  components/               # PlaceSearch(자동완성), RouteMap(경로 미리보기), 공통 UI
+  components/               # PlaceSearch, DraggableList, RouteMapView(TMAP 지도 / 미리보기), 공통 UI
   lib/
     tsp.ts                  # Held-Karp(≤10곳) / Nearest Neighbor + 2-opt
     optimizer.ts            # 거점 조합·수단 선택·비용 행렬·결과 조립
     fare.ts                 # 인원·분류별 요금 규칙
     estimate.ts             # 직선거리 기반 추정 (더미·추정 전략용)
+    tmapHtml.ts             # TMAP 지도(Web SDK) 페이지 생성
   services/
     routing/                # RoutingProvider 인터페이스, TMAP·더미 구현, 캐싱
     routePlanner.ts         # 경로 계산·구간 재검색 흐름
+    location.ts             # GPS 현재 위치 + 역지오코딩
     secureStorage.ts
   store/                    # Zustand (여행 설정, 앱 설정)
 docs/                       # 설계·결정 문서
@@ -75,6 +89,7 @@ docs/                       # 설계·결정 문서
 | [docs/api-selection.md](docs/api-selection.md) | 네이버·TMAP·카카오 API 비교와 TMAP 선정 이유 |
 | [docs/routing.md](docs/routing.md) | 최적화 알고리즘, 거점, 수단 선택, 구간 재검색, 요금 계산 규칙 |
 | [docs/api-key-management.md](docs/api-key-management.md) | API 키 입력 방식 검토 (설정 탭 / .env / 프록시 서버) |
+| [docs/roadmap.md](docs/roadmap.md) | 앞으로 만들 기능 (종합 경로 안내 등) |
 
 > **README 작성 원칙**: README에는 처음 보는 사람이 알아야 할 것(무엇을 하는 앱인지, 주요 기능 요약, 실행·설정 방법, 구조)만 두고,
 > 알고리즘·API 비교·설계 결정 같은 상세 내용은 `docs/`로 분리합니다. 주요 기능을 README에 요약하는 것은 일반적인 관행이지만,

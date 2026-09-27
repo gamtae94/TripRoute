@@ -1,5 +1,5 @@
 import { estimateLeg } from '../../lib/estimate';
-import type { LegInfo, Place, TransportMode, TravelMatrices } from '../../types';
+import type { Coord, LegInfo, Place, TransportMode, TravelMatrices } from '../../types';
 
 export interface LegQuery {
   /** 출발 일시 'YYYYMMDDHHmm' (대중교통 시간표 반영용, 선택) */
@@ -17,6 +17,8 @@ export interface RoutingProvider {
   searchPlaces(query: string): Promise<Place[]>;
   /** 두 지점 사이 한 구간 */
   getLeg(from: Place, to: Place, mode: TransportMode, query?: LegQuery): Promise<LegInfo>;
+  /** 좌표 → 주소 (지원하지 않으면 생략) */
+  reverseGeocode?(coord: Coord): Promise<string | null>;
 }
 
 /**

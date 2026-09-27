@@ -4,7 +4,8 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { PlaceSearch } from '@/components/PlaceSearch';
 import { Button, Screen, SectionTitle, StepHeader, styles, ToggleRow } from '@/components/ui';
-import { DUMMY_CURRENT_LOCATION } from '@/data/dummyPlaces';
+import { getCurrentPlace } from '@/services/location';
+import { getRoutingProvider } from '@/services/routing';
 import { useTripStore } from '@/store/tripStore';
 import { colors } from '@/theme';
 import type { Place } from '@/types';
@@ -12,6 +13,20 @@ import type { Place } from '@/types';
 export default function OriginScreen() {
   const s = useTripStore();
   const [showHubs, setShowHubs] = useState(s.entryHubs.length > 0 || s.exitHubs.length > 0);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const onCurrentLocation = async () => {
+    setLocating(true);
+    setLocationError(null);
+    try {
+      s.setOrigin(await getCurrentPlace(getRoutingProvider()));
+    } catch (e) {
+      setLocationError(e instanceof Error ? e.message : '현재 위치를 가져오지 못했습니다.');
+    } finally {
+      setLocating(false);
+    }
+  };
 
   return (
     <Screen footer={<Button label="다음: 장소 추가" disabled={!s.origin} onPress={() => router.push('/places')} />}>
@@ -30,8 +45,13 @@ export default function OriginScreen() {
         </View>
       ) : (
         <>
-          {/* TODO: expo-location으로 실제 GPS 좌표 + 역지오코딩 */}
-          <Button label="📍 현재 위치 사용" variant="secondary" onPress={() => s.setOrigin(DUMMY_CURRENT_LOCATION)} />
+          <Button
+            label={locating ? '위치 확인 중…' : '📍 현재 위치 사용'}
+            variant="secondary"
+            disabled={locating}
+            onPress={onCurrentLocation}
+          />
+          {locationError ? <Text style={{ color: colors.danger }}>{locationError}</Text> : null}
           <PlaceSearch placeholder="출발지 검색 (예: 서울역, 대전 집)" actionLabel="선택" onSelect={s.setOrigin} />
         </>
       )}

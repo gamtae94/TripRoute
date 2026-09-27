@@ -34,10 +34,3 @@ export const DUMMY_ORIGINS: Place[] = [
   { id: 'express-terminal', name: '서울고속버스터미널', address: '서울 서초구 신반포로 194', category: '터미널', coord: { latitude: 37.5049, longitude: 127.0049 } },
 ];
 
-/** GPS 연동 전 "현재 위치" 버튼이 반환하는 더미 좌표 */
-export const DUMMY_CURRENT_LOCATION: Place = {
-  id: 'current-location',
-  name: '현재 위치',
-  address: '서울 중구 세종대로 110 (더미)',
-  coord: { latitude: 37.5663, longitude: 126.9779 },
-};

@@ -4,10 +4,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors } from '../theme';
 
-export function Screen({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
+export function Screen({
+  children,
+  footer,
+  scrollEnabled = true,
+}: {
+  children: ReactNode;
+  footer?: ReactNode;
+  scrollEnabled?: boolean;
+}) {
   return (
     <SafeAreaView style={styles.screen} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" scrollEnabled={scrollEnabled}>
         {children}
       </ScrollView>
       {footer ? <View style={styles.footer}>{footer}</View> : null}

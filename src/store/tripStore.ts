@@ -38,6 +38,7 @@ interface TripState {
   addPlace: (place: Place) => void;
   removePlace: (id: string) => void;
   movePlace: (index: number, delta: -1 | 1) => void;
+  reorderPlace: (from: number, to: number) => void;
   togglePreferredMode: (mode: TransportMode) => void;
   setCriterion: (criterion: Criterion) => void;
   setKeepManualOrder: (value: boolean) => void;
@@ -83,6 +84,14 @@ export const useTripStore = create<TripState>((set, get) => ({
       if (target < 0 || target >= s.places.length) return s;
       const places = [...s.places];
       [places[index], places[target]] = [places[target], places[index]];
+      return { places };
+    }),
+  reorderPlace: (from, to) =>
+    set((s) => {
+      if (from === to || from < 0 || to < 0 || from >= s.places.length || to >= s.places.length) return s;
+      const places = [...s.places];
+      const [moved] = places.splice(from, 1);
+      places.splice(to, 0, moved);
       return { places };
     }),
   togglePreferredMode: (mode) =>

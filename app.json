@@ -23,7 +23,13 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "현재 위치를 출발지로 사용하기 위해 위치 정보가 필요합니다."
+        }
+      ]
     ],
     "scheme": "triproute",
     "experiments": {

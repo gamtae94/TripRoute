@@ -101,6 +101,12 @@ describe('TmapRoutingProvider (응답 파싱)', () => {
     expect(leg.note).toContain('가까워서');
   });
 
+  it('역지오코딩', async () => {
+    const fetch = mockFetch(200, { addressInfo: { fullAddress: '서울특별시 중구 세종대로 110' } });
+    await expect(provider.reverseGeocode({ latitude: 37.5663, longitude: 126.9779 })).resolves.toBe('서울특별시 중구 세종대로 110');
+    expect(fetch.mock.calls[0][0]).toContain('/tmap/geo/reversegeocoding?');
+  });
+
   it('HTTP 오류는 예외', async () => {
     mockFetch(403, { error: { message: 'INVALID_API_KEY' } });
     await expect(provider.getLeg(a, b, 'walk')).rejects.toThrow('403');

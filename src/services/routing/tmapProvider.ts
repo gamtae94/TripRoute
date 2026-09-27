@@ -7,6 +7,7 @@ import type { LegQuery, RoutingProvider } from './types';
  * - 자동차:    자동차 경로   POST /tmap/routes            (taxiFare 제공)
  * - 도보:      보행자 경로   POST /tmap/routes/pedestrian
  * - 대중교통:  대중교통      POST /transit/routes         (fare.regular.totalFare 제공, 기차·고속버스 포함)
+ * - 역지오코딩: 좌표→주소     GET  /tmap/geo/reversegeocoding
  * 모든 요청은 헤더 appKey로 인증한다. 좌표계는 WGS84GEO.
  *
  * NOTE: 응답 필드는 공개 문서 기준으로 작성했다. 실제 키로 처음 연동할 때 응답을 한 번 확인할 것.
@@ -56,6 +57,20 @@ export class TmapRoutingProvider implements RoutingProvider {
     const data = await this.request<PoiResponse>(`/tmap/pois?${params}`, { method: 'GET' });
     const pois = data?.searchPoiInfo?.pois?.poi ?? [];
     return pois.map(toPlace);
+  }
+
+  async reverseGeocode(coord: Coord): Promise<string | null> {
+    const params = new URLSearchParams({
+      version: '1',
+      lat: String(coord.latitude),
+      lon: String(coord.longitude),
+      coordType: 'WGS84GEO',
+      addressType: 'A10',
+    });
+    const data = await this.request<{ addressInfo?: { fullAddress?: string } }>(`/tmap/geo/reversegeocoding?${params}`, {
+      method: 'GET',
+    });
+    return data?.addressInfo?.fullAddress ?? null;
   }
 
   async getLeg(from: Place, to: Place, mode: TransportMode, query?: LegQuery): Promise<LegInfo> {
