@@ -43,6 +43,21 @@ npm run typecheck     # 타입 검사
 npm test              # 단위 테스트 (최적화·요금·TMAP 응답 파싱·위치·지도)
 ```
 
+### 컴퓨터 없이 핸드폰만으로 실행하기
+
+핸드폰 브라우저에서 **GitHub Codespaces**를 쓰면 컴퓨터 없이도 실행할 수 있습니다.
+
+1. GitHub 앱 또는 모바일 브라우저로 이 저장소(또는 확인할 브랜치/PR)를 엽니다.
+2. **Code → Codespaces 탭 → Create codespace on \<branch\>**를 누릅니다. (`postCreateCommand`가 `npm install`을 자동 실행합니다)
+3. 브라우저 안 VS Code가 뜨면 하단 **터미널**을 열고 실행합니다.
+   ```bash
+   npm run start:tunnel   # = expo start --tunnel (핸드폰과 다른 네트워크에서도 접속 가능)
+   ```
+4. 터미널에 `exp://...` 로 시작하는 주소가 나오면 그 텍스트를 복사합니다. (QR 코드는 같은 화면이라 이 화면에서는 스캔할 수 없어요)
+5. **Expo Go** 앱을 열고 하단 **프로필 → Enter URL manually**에 복사한 주소를 붙여넣습니다.
+
+Codespaces는 무료 시간 한도 내에서 GitHub 계정으로 바로 쓸 수 있습니다.
+
 ## API 키 설정
 
 1. [SK open API](https://openapi.sk.com)에서 TMAP 앱을 등록하고 appKey를 발급받습니다. 대중교통 API는 별도 사용 신청이 필요합니다.
