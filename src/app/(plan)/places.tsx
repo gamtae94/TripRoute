@@ -37,7 +37,7 @@ export default function PlacesScreen() {
         <Text style={styles.muted}>아직 추가된 장소가 없습니다.</Text>
       ) : (
         <Text style={styles.muted}>
-          ↑↓로 순서를 조정할 수 있어요. 다음 화면에서 "내가 정한 순서 유지"를 켜면 이 순서 그대로 안내합니다.
+          ↑↓로 순서를 조정할 수 있어요. 다음 화면에서 “내가 정한 순서 유지”를 켜면 이 순서 그대로 안내합니다.
           {places.length > EXACT_LIMIT ? ` (${EXACT_LIMIT}곳 초과: 근사 최적해로 계산)` : ''}
         </Text>
       )}

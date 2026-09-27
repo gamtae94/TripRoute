@@ -21,11 +21,16 @@ export const DUMMY_PLACES: Place[] = [
   { id: 'lotteworldtower', name: '롯데월드타워', address: '서울 송파구 올림픽로 300', category: '관광명소', coord: { latitude: 37.5125, longitude: 127.1025 } },
 ];
 
-/** 출발지로 자주 쓰이는 지점 (역·공항 등) */
+/** 출발지·거점으로 자주 쓰이는 지점 (역·공항 등) */
 export const DUMMY_ORIGINS: Place[] = [
   { id: 'seoulstation', name: '서울역', address: '서울 용산구 한강대로 405', category: '기차역', coord: { latitude: 37.5547, longitude: 126.9707 } },
   { id: 'gangnamstation', name: '강남역', address: '서울 강남구 강남대로 396', category: '지하철역', coord: { latitude: 37.4979, longitude: 127.0276 } },
   { id: 'gimpoairport', name: '김포공항', address: '서울 강서구 하늘길 112', category: '공항', coord: { latitude: 37.5586, longitude: 126.7944 } },
+  { id: 'yongsanstation', name: '용산역', address: '서울 용산구 한강대로23길 55', category: '기차역', coord: { latitude: 37.5298, longitude: 126.9648 } },
+  { id: 'yeongdeungpostation', name: '영등포역', address: '서울 영등포구 경인로 846', category: '기차역', coord: { latitude: 37.5157, longitude: 126.9075 } },
+  { id: 'daejeonstation', name: '대전역', address: '대전 동구 중앙로 215', category: '기차역', coord: { latitude: 36.3326, longitude: 127.4342 } },
+  { id: 'seodaejeonstation', name: '서대전역', address: '대전 중구 오류로 23', category: '기차역', coord: { latitude: 36.3225, longitude: 127.404 } },
+  { id: 'daejeon-home', name: '대전 집 (예시)', address: '대전 서구 둔산동 (더미)', category: '주거지', coord: { latitude: 36.3504, longitude: 127.3845 } },
   { id: 'express-terminal', name: '서울고속버스터미널', address: '서울 서초구 신반포로 194', category: '터미널', coord: { latitude: 37.5049, longitude: 127.0049 } },
 ];
 

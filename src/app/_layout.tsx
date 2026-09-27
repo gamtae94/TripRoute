@@ -1,16 +1,37 @@
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router/js-tabs';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { Text } from 'react-native';
+
+import { useSettingsStore } from '@/store/settingsStore';
+
+const TabIcon = ({ icon, focused }: { icon: string; focused: boolean }) => (
+  <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>{icon}</Text>
+);
 
 export default function RootLayout() {
+  const load = useSettingsStore((s) => s.load);
+  useEffect(() => {
+    load();
+  }, [load]);
+
   return (
     <>
       <StatusBar style="dark" />
-      <Stack screenOptions={{ headerBackTitle: '뒤로' }}>
-        <Stack.Screen name="index" options={{ title: '출발지 설정' }} />
-        <Stack.Screen name="places" options={{ title: '장소 추가' }} />
-        <Stack.Screen name="options" options={{ title: '이동 수단 · 기준' }} />
-        <Stack.Screen name="result" options={{ title: '최적 경로' }} />
-      </Stack>
+      <Tabs>
+        <Tabs.Screen
+          name="(plan)"
+          options={{
+            title: '경로 만들기',
+            headerShown: false,
+            tabBarIcon: ({ focused }) => <TabIcon icon="🗺️" focused={focused} />,
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{ title: '설정', tabBarIcon: ({ focused }) => <TabIcon icon="⚙️" focused={focused} /> }}
+        />
+      </Tabs>
     </>
   );
 }
